@@ -24,11 +24,17 @@ export async function GET(req: NextRequest) {
   try {
     const email = await completeGoogleAuthorization(code);
     const response = NextResponse.redirect(destination);
-    response.cookies.set(SESSION_COOKIE, createSession(email), sessionCookieOptions);
+    response.cookies.set(SESSION_COOKIE, createSession(email), sessionCookieOptions());
     response.cookies.delete(STATE_COOKIE);
     response.headers.set("Cache-Control", "no-store");
     return response;
-  } catch {
+  } catch (error) {
+    const detail = error as { code?: unknown; response?: { status?: unknown } };
+    console.error("[regelradar] Google OAuth callback failed", {
+      name: error instanceof Error ? error.name : "UnknownError",
+      code: typeof detail?.code === "string" ? detail.code : undefined,
+      status: typeof detail?.response?.status === "number" ? detail.response.status : undefined,
+    });
     destination.searchParams.set("auth_error", "koppeling-mislukt");
     const response = NextResponse.redirect(destination);
     response.cookies.delete(STATE_COOKIE);

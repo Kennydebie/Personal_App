@@ -191,7 +191,9 @@ export function Dashboard() {
     const url = new URL(window.location.href);
     const authError = url.searchParams.get('auth_error');
     if (!authError) return;
-    setError('Inloggen met Google is niet gelukt. Controleer de toegang en probeer opnieuw.');
+    setError(authError === 'ongeldige-aanmelding'
+      ? 'De aanmelding is verlopen of vanaf een ander lokaal adres gestart. Open localhost:3000 en probeer opnieuw.'
+      : 'Inloggen met Google is niet gelukt. Controleer de toegang en probeer opnieuw.');
     url.searchParams.delete('auth_error');
     window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
   }, []);

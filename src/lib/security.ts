@@ -69,10 +69,12 @@ export function sameOrigin(req: NextRequest): boolean {
   return fetchSite === "same-origin" || fetchSite === "none";
 }
 
-export const sessionCookieOptions = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax" as const,
-  path: "/",
-  maxAge: SESSION_SECONDS,
-};
+export function sessionCookieOptions() {
+  return {
+    httpOnly: true,
+    secure: new URL(getConfig().googleRedirectUri).protocol === "https:",
+    sameSite: "lax" as const,
+    path: "/",
+    maxAge: SESSION_SECONDS,
+  };
+}
